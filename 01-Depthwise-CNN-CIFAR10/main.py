@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets,transforms
 import torch.optim as optim
+import matplotlib.pyplot as plt
 
 # 深度可分离卷积块：深度卷积(3x3) + 逐点卷积(1x1)，无池化，用stride下采样
 def ConBlock(in_ch, out_ch):
@@ -53,11 +54,17 @@ epochs = 10
 lr = 1e-3
 
 #dataloader
-transform = transforms.Compose([
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],std=[0.2023, 0.1994, 0.2010])
 ])
-train_set = datasets.CIFAR10('./data', train=True, transform=transform, download=True)
+transform_val = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],std=[0.2023, 0.1994, 0.2010])
+])
+train_set = datasets.CIFAR10('./data', train=True, transform=transform_train, download=True)
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 val_set = datasets.CIFAR10('./data', train=False, transform=transform, download=True)
 val_loader = DataLoader(val_set, batch_size=batch_size,shuffle=False)
@@ -65,7 +72,8 @@ val_loader = DataLoader(val_set, batch_size=batch_size,shuffle=False)
 model = Network()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(),lr=lr)
-
+train_losses = []
+test_accs = []
 
 for epoch in range(epochs):
     model.train()
@@ -77,6 +85,8 @@ for epoch in range(epochs):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
+    avg_loss=total_loss / len(train_loader)
+    train_losses.append(avg_loss)
     print(f"Epoch {epoch+1}, Loss: {total_loss/len(train_loader):.4f}")
 
     model.eval()
@@ -87,4 +97,25 @@ for epoch in range(epochs):
             pred = outputs.argmax(dim=1)
             correct += (pred==labels).sum().item()
     acc = correct / len(val_set)
+    test_accs.append(acc)
     print(f"Val Acc: {acc:.4f}")
+
+plt.figure(figsize=(12,4))
+plt.subplot(1,2,1)
+plt.plot(range(1,epochs+1),train_losses, marker='o', label='train loss')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.title('Train_loss')
+plt.grid(True)
+plt.legend()
+
+#准确率
+plt.subplot(1,2,2)
+plt.plot(range(1,epochs+1),test_accs,marker='s', label = 'accuracy')
+plt.xlabel('epoch')
+plt.ylabel('accuracy')
+plt.title('validation accuracy curve')
+plt.grid(True)
+plt.legend()
+
+plt.show()    
