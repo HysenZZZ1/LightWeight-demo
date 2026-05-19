@@ -60,19 +60,7 @@ class ResNet(nn.Module):
         self.conv1 = DwConvBlock(3, 32, stride=1)
 
         self.layer1 = self.make_layer(32, 64, 3, 1)
-        self.layer2 = self.make_layer
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        (64, 128, 4, 2)
+        self.layer2 = self.make_layer(64, 128, 4, 2)
         self.layer3 = self.make_layer(128, 256, 6, 2)
         self.layer4 = self.make_layer(256, 512, 3, 2)
 
