@@ -140,7 +140,7 @@ for epoch in range (epochs):
     train_losses.append(avg_loss)
     print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
     
-    # 每个epoch都测试准确率（原代码只在最后测试一次，修正后更合理）
+    # 每个epoch都测试准确率
     model1.eval()
     correct = 0
     with torch.no_grad():
