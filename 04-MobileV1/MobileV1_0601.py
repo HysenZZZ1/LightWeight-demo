@@ -89,7 +89,8 @@ transforms_train = transforms.Compose([
 ])
 
 transforms_val = transforms.Compose([
-    transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],std=[0.2023, 0.1994, 0.2010])
+    transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],std=[0.2023, 0.1994, 0.2010]),
+    transforms.ToTensor()
 ])
 
 train_set = datasets.CIFAR10(root='./data', train=True, transform=transforms_train, download=True)
